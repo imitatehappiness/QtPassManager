@@ -31,18 +31,29 @@ MainWindow::MainWindow(QWidget *parent)
     mStackedWidget = new QStackedWidget(this);
     setCentralWidget(mStackedWidget);
 
-    QWidget *accountListWidget = new QWidget(this);
-    accountListWidget->setObjectName("accountList");
+    // Создаем контейнер для строки поиска и списка аккаунтов
+    QWidget *mainWidget = new QWidget(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
 
-    mMainLayout = new QVBoxLayout(accountListWidget);
-    mMainLayout->setContentsMargins(0, 0, 0, 0);
-
+    // Создаем контейнер для строки поиска
+    QWidget *searchWidget = new QWidget(this);
+    QHBoxLayout *searchLayout = new QHBoxLayout(searchWidget);
     mSearchLineEdit = new QLineEdit(this);
     mSearchLineEdit->setPlaceholderText(tr("Search..."));
-    mSearchLineEdit->setStyleSheet("background-color: #eee; color: rgb(24, 24, 24)");
+    mSearchLineEdit->setStyleSheet("background-color: #eee; color: rgb(24, 24, 24); margin-right: 15px;");
 
     connect(mSearchLineEdit, &QLineEdit::textChanged, this, &MainWindow::searchTextChanged);
-    mMainLayout->addWidget(mSearchLineEdit);
+    searchLayout->addWidget(mSearchLineEdit);
+    searchWidget->setLayout(searchLayout);
+
+    // Добавляем виджет с поиском в основной layout
+    mainLayout->addWidget(searchWidget);
+
+    // Создаем scroll area для списка аккаунтов
+    QWidget *accountListWidget = new QWidget(this);
+    accountListWidget->setObjectName("accountList");
+    mMainLayout = new QVBoxLayout(accountListWidget);
+    mMainLayout->setContentsMargins(0, 0, 0, 0);
 
     ui->scrollArea->setWidget(accountListWidget);
     ui->scrollArea->setWidgetResizable(true);
@@ -51,8 +62,15 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *scrollContainer = new QWidget(this);
     QVBoxLayout *scrollContainerLayout = new QVBoxLayout(scrollContainer);
     scrollContainerLayout->addWidget(ui->scrollArea);
-    mStackedWidget->addWidget(scrollContainer);
 
+    // Добавляем scroll container в основной layout
+    mainLayout->addWidget(scrollContainer);
+
+    // Устанавливаем основной layout в main widget
+    mainWidget->setLayout(mainLayout);
+    mStackedWidget->addWidget(mainWidget);
+
+    // Создаем остальные формы
     mAccountPageForm = new AccountPageForm();
     mCreateAccountForm = new CreateAccountForm();
 
@@ -86,7 +104,7 @@ void MainWindow::initMenuBar() {
 
 void MainWindow::updateAccountsForm() {
     QLayoutItem *child;
-    while ((child = mMainLayout->takeAt(1)) != nullptr) {
+    while ((child = mMainLayout->takeAt(0)) != nullptr) {
         if (child->widget()) delete child->widget();
         delete child;
     }
@@ -148,7 +166,7 @@ void MainWindow::openMainPage(){
 }
 
 void MainWindow::searchTextChanged(const QString &searchText) {
-    for (int i = mMainLayout->count() - 1; i > 0; --i) {
+    for (int i = mMainLayout->count() - 1; i >= 0; --i) {
         QLayoutItem *child = mMainLayout->takeAt(i);
         if (child) {
             delete child->widget();
