@@ -59,6 +59,7 @@ void CreateAccountForm::clearFields(){
     ui->lE_login->clear();
     ui->lE_pass->clear();
     ui->lE_title->clear();
+    ui->icon->clear();
 
     ui->cB_useNumber->setCheckState(Qt::Unchecked);
     ui->cB_userCpecialCharacters->setCheckState(Qt::Unchecked);
