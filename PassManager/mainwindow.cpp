@@ -131,6 +131,7 @@ void MainWindow::closeAccountPage() {
 
 void MainWindow::createNewAccount() {
     mStackedWidget->setCurrentIndex(2);
+    mCreateAccountForm->clearFields();
 }
 
 void MainWindow::createAccount(QString password, QString login, QString title){

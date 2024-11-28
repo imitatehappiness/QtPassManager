@@ -12,6 +12,8 @@ class CreateAccountForm : public QWidget
 public:
     explicit CreateAccountForm(QWidget *parent = nullptr);
     ~CreateAccountForm();
+    void clearFields();
+
 private:
     QString generatePassword(int length);
 signals:

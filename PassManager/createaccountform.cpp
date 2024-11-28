@@ -55,6 +55,15 @@ QString CreateAccountForm::generatePassword(int length) {
     return password;
 }
 
+void CreateAccountForm::clearFields(){
+    ui->lE_login->clear();
+    ui->lE_pass->clear();
+    ui->lE_title->clear();
+
+    ui->cB_useNumber->setCheckState(Qt::Unchecked);
+    ui->cB_userCpecialCharacters->setCheckState(Qt::Unchecked);
+}
+
 
 void CreateAccountForm::on_lE_title_textChanged(const QString &arg1){
     ui->l_title->setText(arg1);
@@ -93,7 +102,6 @@ void CreateAccountForm::on_pB_create_clicked(){
     emit createAccount(password, login, title);
 }
 
-
 void CreateAccountForm::on_pB_showPass_clicked(){
     bool isActive = ui->pB_showPass->property("active").toBool();
 
@@ -110,13 +118,11 @@ void CreateAccountForm::on_pB_showPass_clicked(){
     }
 }
 
-
 void CreateAccountForm::on_pB_cancel_clicked(){
     emit cancel();
 }
 
 void CreateAccountForm::on_pB_generatePass_clicked(){
-
     ui->lE_pass->setText(generatePassword(ui->sB_passLength->value()));
 }
 
