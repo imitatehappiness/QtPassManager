@@ -9,8 +9,6 @@
 #include <QTextEdit>
 #include <QStackedWidget>
 
-
-#include <colorform.h>
 #include <itemblock.h>
 #include <accountpageform.h>
 #include <createaccountform.h>
