@@ -64,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
     mainWidget->setLayout(mainLayout);
     mStackedWidget->addWidget(mainWidget);
 
-    // Создаем остальные формы
     mAccountPageForm = new AccountPageForm();
     mCreateAccountForm = new CreateAccountForm();
 
