@@ -14,6 +14,10 @@
 
 PassManager is a simple application for managing credentials. Suitable for personal use when you need to organize your passwords quickly and easily.
 
+
+<details>
+<summary>Preview</summary>
 <p align="center">
 	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/demo.png"  />
 </p>
+</details>
