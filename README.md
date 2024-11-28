@@ -18,7 +18,7 @@ PassManager is a simple application for managing credentials. Suitable for perso
 
 ## Build
 
-```
+```bash
 git clone https://github.com/imitatehappiness/QtPassManager.git
 cd QtPassManager/PassManager
 qmake PassManager.pro
@@ -26,10 +26,9 @@ mingw32-make
 cd release
 ./PassManager.exe
 ```
-## Demo
-<details>
-<summary>Preview</summary>
+
+## UI Demonstration 
+
 <p align="center">
 	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/demo.png"  />
 </p>
-</details>
