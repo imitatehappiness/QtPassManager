@@ -1,6 +1,6 @@
 
 <p align="center">
-	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/icon.png" width="200" height="200" />
+	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/icon.png" width="128" height="128" />
 </p>
 
 # PassManager
