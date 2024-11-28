@@ -76,13 +76,14 @@ QStatusBar{
 
 QScrollBar:vertical {
     background-color: rgb(24, 24, 24);
-    width: 15px;
-    margin: 0px 6px 0px 6px;
+    width: 8px;
+    margin: 0px 0px 0px 5px;
+    border-radius: 10px;
 }
 
 QScrollBar::handle:vertical {
     background: #eee;
-    border-radius: 20px;
+    border-radius: 10px;
     min-height: 5px;
 }
 

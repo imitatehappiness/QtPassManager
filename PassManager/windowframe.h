@@ -73,9 +73,9 @@ private:
     int mBorderSize;
     /// Collapse flag.
     bool mIsCollapse;
-
+    /// Tra
     QSystemTrayIcon * mTrayIcon;
-
+    /// MainWindow
     QWidget* mChild;
 };
 

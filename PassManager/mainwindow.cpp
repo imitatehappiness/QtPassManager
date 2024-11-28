@@ -31,25 +31,21 @@ MainWindow::MainWindow(QWidget *parent)
     mStackedWidget = new QStackedWidget(this);
     setCentralWidget(mStackedWidget);
 
-    // Создаем контейнер для строки поиска и списка аккаунтов
     QWidget *mainWidget = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
 
-    // Создаем контейнер для строки поиска
     QWidget *searchWidget = new QWidget(this);
     QHBoxLayout *searchLayout = new QHBoxLayout(searchWidget);
     mSearchLineEdit = new QLineEdit(this);
     mSearchLineEdit->setPlaceholderText(tr("Search..."));
-    mSearchLineEdit->setStyleSheet("background-color: #eee; color: rgb(24, 24, 24); margin-right: 15px;");
+    mSearchLineEdit->setStyleSheet("background-color: #eee; color: rgb(24, 24, 24);");
 
     connect(mSearchLineEdit, &QLineEdit::textChanged, this, &MainWindow::searchTextChanged);
     searchLayout->addWidget(mSearchLineEdit);
     searchWidget->setLayout(searchLayout);
 
-    // Добавляем виджет с поиском в основной layout
     mainLayout->addWidget(searchWidget);
 
-    // Создаем scroll area для списка аккаунтов
     QWidget *accountListWidget = new QWidget(this);
     accountListWidget->setObjectName("accountList");
     mMainLayout = new QVBoxLayout(accountListWidget);
@@ -63,10 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *scrollContainerLayout = new QVBoxLayout(scrollContainer);
     scrollContainerLayout->addWidget(ui->scrollArea);
 
-    // Добавляем scroll container в основной layout
     mainLayout->addWidget(scrollContainer);
 
-    // Устанавливаем основной layout в main widget
     mainWidget->setLayout(mainLayout);
     mStackedWidget->addWidget(mainWidget);
 
@@ -123,7 +117,7 @@ void MainWindow::updateAccountsForm() {
 }
 
 void MainWindow::addVerticalBlock(const AccountInfo &accountInfo) {
-    auto *accountInfoPtr = new AccountInfo(accountInfo);  // Создаем копию объекта
+    auto *accountInfoPtr = new AccountInfo(accountInfo);
     auto *item = new ItemBlock(nullptr, accountInfoPtr);
 
     mMainLayout->addWidget(item);
