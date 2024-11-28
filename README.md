@@ -1,0 +1,2 @@
+# QtPassManager
+🔒Local password manager
