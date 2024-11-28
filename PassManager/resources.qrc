@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/style/appstyles.qss</file>
+        <file>resources/icons/close.png</file>
+        <file>resources/icons/close_light.png</file>
+        <file>resources/icons/collapse_hide.png</file>
+        <file>resources/icons/collapse_hide_light.png</file>
+        <file>resources/icons/collapse_show.png</file>
+        <file>resources/icons/collapse_show_light.png</file>
+        <file>resources/icons/default_size.png</file>
+        <file>resources/icons/default_size_light.png</file>
+        <file>resources/icons/icon.png</file>
+        <file>resources/icons/maximize.png</file>
+        <file>resources/icons/maximize_light.png</file>
+        <file>resources/icons/minimize.png</file>
+        <file>resources/icons/minimize_light.png</file>
+    </qresource>
+</RCC>

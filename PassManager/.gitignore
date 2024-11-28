@@ -52,3 +52,11 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+/release
+/debug
+
+/.qtc_clangd
+
+*.Release
+*.Debug
