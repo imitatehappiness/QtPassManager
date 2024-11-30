@@ -26,6 +26,11 @@ mingw32-make
 cd release
 ./PassManager.exe
 ```
+### windeployqt
+```bash
+windeployqt --compiler-runtime QtPassManager/PassManager/release/PassManager.exe
+```
+After executing this command, all dependencies will appear in the directory where `PassManager.exe` is located, making the application self-sufficient for distribution to other computers.
 
 ## UI Demonstration 
 
