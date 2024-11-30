@@ -26,11 +26,17 @@ mingw32-make
 cd release
 ./PassManager.exe
 ```
-### windeployqt
+
+## Deploying the Application
+Use [windeployqt](https://doc.qt.io/qt-6/windows-deployment.html) to gather all necessary dependencies:
+
 ```bash
 windeployqt --compiler-runtime QtPassManager/PassManager/release/PassManager.exe
 ```
-After executing this command, all dependencies will appear in the directory where `PassManager.exe` is located, making the application self-sufficient for distribution to other computers.
+
+After executing this command:
+- All required dependencies (Qt libraries, plugins, etc.) will be copied into the directory containing PassManager.exe.
+- The application will be self-contained and ready for distribution to other systems.
 
 ## UI Demonstration 
 
