@@ -16,7 +16,6 @@ PassManager is a simple application for managing credentials. Suitable for perso
 
 All data is stored locally:
 - `C:\Users\<Username>\AppData\Roaming\PassManager\accounts.xml`
-- `C:\Users\<Username>\AppData\Roaming\PassManager\groups.xml`
 
 [My Custom Title Bar Template](https://github.com/imitatehappiness/QtCustomTitleBar)
 
