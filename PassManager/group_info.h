@@ -1,49 +1,40 @@
 #pragma once
 #include <QWidget>
 
-#include <types.h>
-struct AccountInfo
+#include "account_info.h"
+#include "types.h"
+
+struct GroupInfo
 {
-    AccountInfo(
+    GroupInfo(
             int id,
-            const QString& login,
-            const QString& password,
+            QVector<AccountInfo*> accounts,
             const QString& title = "",
             QColor bgColor = QColor(bgCardColorName),
-            QColor iconColor = QColor(bgIconAccountColorName),
+            QColor iconColor = QColor(bgIconGroupColorName),
             bool favorite = false) :
         mId(id),
-        mLogin(login),
-        mPassword(password),
         mTitle(title),
         mBgColor(bgColor),
         mIconColor(iconColor),
-        mFavotite(favorite)
+        mFavotite(favorite),
+        mAccounts(accounts)
     {
     }
 
-    AccountInfo(const AccountInfo& other):
+    GroupInfo(const GroupInfo& other):
         mId(other.mId),
-        mLogin(other.mLogin),
-        mPassword(other.mPassword),
         mTitle(other.mTitle),
         mBgColor(other.mBgColor),
         mIconColor(other.mIconColor),
-        mFavotite(other.mFavotite)
+        mFavotite(other.mFavotite),
+        mAccounts(other.mAccounts)
     {
     }
 
-    ~AccountInfo()
+    ~GroupInfo()
     {
 
-    }
-
-    void setLogin(const QString& login){
-        this->mLogin = login;
-    }
-
-    void setPassword(const QString& password){
-        this->mPassword = password;
     }
 
     void setTitle(const QString& title){
@@ -66,14 +57,6 @@ struct AccountInfo
         return this->mId;
     }
 
-    QString getLogin(){
-        return this->mLogin;
-    }
-
-    QString getPassword(){
-        return this->mPassword;
-    }
-
     QString getTitle(){
         return this->mTitle;
     }
@@ -90,12 +73,39 @@ struct AccountInfo
         return this->mFavotite;
     }
 
+    QVector<AccountInfo*> getAccounts(){
+        return this->mAccounts;
+    }
+
+    void setAccounts(QVector<AccountInfo*> accounts){
+        this->mAccounts = accounts;
+    }
+
+    void appendAccount(AccountInfo* mew_account) {
+
+        for (const auto& account : mAccounts) {
+            if (account->getId() == mew_account->getId()) {
+                return;
+            }
+        }
+
+        mAccounts.append(mew_account);
+    }
+
+    void removeAccount(int id) {
+        for (int i = 0; i < mAccounts.size(); ++i) {
+            if (mAccounts[i]->getId() == id) {
+                mAccounts.remove(i);
+                return;
+            }
+        }
+    }
+
 private:
     int mId;
-    QString mLogin;
-    QString mPassword;
     QString mTitle;
     QColor mBgColor;
     QColor mIconColor;
     bool mFavotite;
+    QVector<AccountInfo*> mAccounts;
 };

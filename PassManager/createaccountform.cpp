@@ -1,35 +1,17 @@
 #include "createaccountform.h"
 #include "ui_createaccountform.h"
+#include "types.h"
 
 #include <QMessageBox>
 #include <QRandomGenerator>
-
-const  QString msgBoxStyle =
-    "QMessageBox {"
-    "   background-color: rgb(33, 33, 33);"
-    "   color: #eee;"
-    "}"
-    "QPushButton {"
-    "   background-color: rgb(24, 24, 24);"
-    "   color: #fff;"
-    "   border: 1px solid rgb(24, 24, 24);"
-    "   border-radius: 5px;"
-    "   padding: 5px 10px;"
-    "   min-width: 40px;"
-    "}"
-    "QPushButton:hover {"
-    "   background-color: rgb(60, 60, 60);"
-    "   border: 1px solid rgb(60, 60, 60);"
-    "}"
-    "QPushButton:pressed {"
-    "   border: 1px solid rgb(20, 20, 20);"
-    "}";
 
 CreateAccountForm::CreateAccountForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::createAccountForm)
 {
     ui->setupUi(this);
+
+    ui->icon->setStyleSheet("border-radius: 5px; background-color: " + bgIconAccountColorName);
 }
 
 CreateAccountForm::~CreateAccountForm(){
@@ -70,6 +52,8 @@ void CreateAccountForm::on_lE_title_textChanged(const QString &arg1){
     ui->l_title->setText(arg1);
     if (arg1.size() > 0){
         ui->icon->setText(QString(arg1.at(0)).toUpper());
+    }else{
+        ui->icon->setText("");
     }
 }
 

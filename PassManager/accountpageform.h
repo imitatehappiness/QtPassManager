@@ -1,6 +1,7 @@
 #pragma once
 
 #include "account_info.h"
+#include "types.h"
 #include <QWidget>
 
 class PopUp;
@@ -36,13 +37,12 @@ private slots:
     void on_pB_editBgColor_clicked();
     void on_pB_resetBgColor_clicked();
     void on_pB_resetIconColor_clicked();
-    void on_pushButton_clicked();
-
+    void on_pB_editIconColor_clicked();
 signals:
-    void closeAccountPage();
+    void closePage(PageType type);
     void showNotification(QString message);
     void updateBlock(AccountInfo *info);
-    void removeBlock(int id);
+    void removeBlock(int id, PageType type);
 private:
     Ui::AccountPageForm *ui;
     AccountInfo* mAccountInfo;

@@ -33,3 +33,6 @@ cd release
 	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/demo.png"  />
 </p>
 </details>
+
+### Updates
+

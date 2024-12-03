@@ -19,14 +19,16 @@
 #include <QStandardPaths>
 #include <QDir>
 
+#include "types.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    mPageType = PageType::main_page;
     this->statusBar()->setSizeGripEnabled(false);
-    initMenuBar();
 
     mStackedWidget = new QStackedWidget(this);
     setCentralWidget(mStackedWidget);
@@ -34,17 +36,23 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *mainWidget = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
 
-    QWidget *searchWidget = new QWidget(this);
-    QHBoxLayout *searchLayout = new QHBoxLayout(searchWidget);
+    QWidget *searchAndSelectWidget = new QWidget(this);
+    QHBoxLayout *searchAndSelectLayout = new QHBoxLayout(searchAndSelectWidget);
     mSearchLineEdit = new QLineEdit(this);
     mSearchLineEdit->setPlaceholderText(tr("Search..."));
-    mSearchLineEdit->setStyleSheet("background-color: #eee; color: rgb(24, 24, 24);");
 
     connect(mSearchLineEdit, &QLineEdit::textChanged, this, &MainWindow::searchTextChanged);
-    searchLayout->addWidget(mSearchLineEdit);
-    searchWidget->setLayout(searchLayout);
+    searchAndSelectLayout->addWidget(mSearchLineEdit);
 
-    mainLayout->addWidget(searchWidget);
+    mTypeSelect = new QComboBox(this);
+    mTypeSelect->addItem(tr("All"));
+    mTypeSelect->addItem(tr("Accounts"));
+    mTypeSelect->addItem(tr("Groups"));
+
+    connect(mTypeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeSelectChanged(int)));
+    searchAndSelectLayout->addWidget(mTypeSelect);
+
+    mainLayout->addWidget(searchAndSelectWidget);
 
     QWidget *accountListWidget = new QWidget(this);
     accountListWidget->setObjectName("accountList");
@@ -65,19 +73,28 @@ MainWindow::MainWindow(QWidget *parent)
     mStackedWidget->addWidget(mainWidget);
 
     mAccountPageForm = new AccountPageForm();
+    mGroupPageForm = new GroupPageForm();
     mCreateAccountForm = new CreateAccountForm();
+    mCreateGroupForm = new CreateGroupForm();
+    mEditGroupPageForm = new EditGroupPageForm();
 
     connectForms();
 
     mStackedWidget->addWidget(mAccountPageForm);
     mStackedWidget->addWidget(mCreateAccountForm);
+    mStackedWidget->addWidget(mCreateGroupForm);
+    mStackedWidget->addWidget(mGroupPageForm);
+    mStackedWidget->addWidget(mEditGroupPageForm);
 
     readAccountsFromXml();
-    updateAccountsForm();
+    readGroupsFromXml();
+    updateMainForm();
 
     mStackedWidget->setCurrentIndex(0);
 
     mPopUp = new PopUp(this);
+
+    initMenuBar();
 }
 
 MainWindow::~MainWindow() {
@@ -86,16 +103,22 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::initMenuBar() {
-    QMenuBar *menuBar = new QMenuBar();
-    setMenuBar(menuBar);
+    mMenuBar = new QMenuBar(this);
+    setMenuBar(mMenuBar);
 
-    QMenu *settingsMenu = menuBar->addMenu(tr("&Settings"));
-    QAction *createAction = settingsMenu->addAction(tr("&Create new account"));
-    createAction->setIcon(QIcon(":/recources/icons/create.png"));
-    connect(createAction, &QAction::triggered, this, &MainWindow::createNewAccount);
+    QMenu *settingsMenu = mMenuBar->addMenu(tr("&Settings"));
+
+    QAction *createAccountAction = settingsMenu->addAction(tr("&Create new account"));
+    createAccountAction->setIcon(QIcon(":/recources/icons/create.png"));
+    connect(createAccountAction, &QAction::triggered, this, &MainWindow::createNewAccount);
+
+    QAction *createGroupAction = settingsMenu->addAction(tr("&Create new group"));
+    createGroupAction->setIcon(QIcon(":/recources/icons/create.png"));
+    connect(createGroupAction, &QAction::triggered, this, &MainWindow::createNewGroup);
 }
 
-void MainWindow::updateAccountsForm() {
+void MainWindow::updateMainForm(ListType type) {
+
     QLayoutItem *child;
     while ((child = mMainLayout->takeAt(0)) != nullptr) {
         if (child->widget()) delete child->widget();
@@ -104,40 +127,109 @@ void MainWindow::updateAccountsForm() {
 
     mItemBlocksArray.clear();
 
-    std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
-        return a->getFavorite() > b->getFavorite();
-    });
+    switch (type) {
+        case ListType::accounts:
+            std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
+                return a->getFavorite() > b->getFavorite();
+            });
 
-    for (auto &info : mAccountInfoArray) {
-        addVerticalBlock(*info);
+            for (auto &info : mAccountInfoArray) {
+                addAccountBlock(*info);
+            }
+            break;
+        case ListType::groups:
+            std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
+                return a->getFavorite() > b->getFavorite();
+            });
+
+            for (auto &info : mGroupInfoArray) {
+                addGroupBlock(*info);
+            }
+            break;
+        default:
+            std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
+                return a->getFavorite() > b->getFavorite();
+            });
+
+            for (auto &info : mGroupInfoArray) {
+                addGroupBlock(*info);
+            }
+
+            std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
+                return a->getFavorite() > b->getFavorite();
+            });
+
+            for (auto &info : mAccountInfoArray) {
+                addAccountBlock(*info);
+            }
+            break;
     }
 
     mMainLayout->addStretch();
 }
 
-void MainWindow::addVerticalBlock(const AccountInfo &accountInfo) {
-    auto *accountInfoPtr = new AccountInfo(accountInfo);
+void MainWindow::addGroupBlock(const GroupInfo &info){
+    GroupInfo *groupInfoPtr = new GroupInfo(info);
+    ItemBlock *item = new ItemBlock(nullptr, groupInfoPtr);
+
+    mMainLayout->addWidget(item);
+    mItemBlocksArray.append(item);
+
+    connect(item, &ItemBlock::openPage, this, &MainWindow::openPage);
+}
+
+void MainWindow::addAccountBlock(const AccountInfo &info) {
+    auto *accountInfoPtr = new AccountInfo(info);
     auto *item = new ItemBlock(nullptr, accountInfoPtr);
 
     mMainLayout->addWidget(item);
     mItemBlocksArray.append(item);
 
-    connect(item, &ItemBlock::openAccountPage, this, &MainWindow::openAccountPage);
+    connect(item, &ItemBlock::openPage, this, &MainWindow::openPage);
 }
 
-void MainWindow::openAccountPage(int id) {
-    for (auto &info : mAccountInfoArray) {
-        if (info->getId() == id) {
-            mAccountPageForm->updateForm(info);
-            break;
+void MainWindow::openPage(int id, PageType type) {
+    if (type == PageType::account){
+
+        if (mPageType != PageType::group) {
+            mPageType = PageType::account;
         }
+
+        for (auto &info : mAccountInfoArray) {
+            if (info->getId() == id) {
+                mAccountPageForm->updateForm(info);
+                break;
+            }
+        }
+        mStackedWidget->setCurrentIndex(1);
+    }else{
+
+        QVector<AccountInfo*> accounts;
+        for(auto& group : mGroupInfoArray){
+            if(id == group->getId()){
+                mGroupPageForm->setGroupInfo(group);
+                mGroupPageForm->updateForm();
+                break;
+            }
+        }
+        mPageType = PageType::group;
+        mStackedWidget->setCurrentIndex(4);
     }
-    mStackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::closeAccountPage() {
-    mStackedWidget->setCurrentIndex(0);
-    mSearchLineEdit->clear();
+void MainWindow::closePage(PageType type) {
+    if (mPageType == PageType::group && type == PageType::account){
+        mPageType = PageType::group;
+        mStackedWidget->setCurrentIndex(4);
+    }else if (type == PageType::edit_group){
+        mPageType = PageType::group;
+        mStackedWidget->setCurrentIndex(4);
+    }else{
+        mPageType = PageType::main_page;
+        mStackedWidget->setCurrentIndex(0);
+        mSearchLineEdit->clear();
+    }
+
 }
 
 void MainWindow::createNewAccount() {
@@ -145,17 +237,56 @@ void MainWindow::createNewAccount() {
     mCreateAccountForm->clearFields();
 }
 
+void MainWindow::createNewGroup(){
+    mStackedWidget->setCurrentIndex(3);
+    mCreateGroupForm->clearFields();
+    mCreateGroupForm->setAccounts(mAccountInfoArray);
+}
+
 void MainWindow::createAccount(QString password, QString login, QString title){
     mAccountInfoArray.append(new AccountInfo(mAccountInfoArray.size() + 1, login, password, title));
-    updateAccountsForm();
+    updateMainForm();
     mStackedWidget->setCurrentIndex(0);
     mSearchLineEdit->clear();
     writeAccountsToXml();
 }
 
+void MainWindow::createGroup(QString title, QVector<int> accounts){
+    QVector<AccountInfo*> resAccounts;
+    for(auto& tempAccount : mAccountInfoArray){
+        for (auto& id : accounts){
+            if (id == tempAccount->getId()){
+                resAccounts.append(tempAccount);
+            }
+        }
+    }
+
+    mGroupInfoArray.append(new GroupInfo(mGroupInfoArray.size() + 1, resAccounts, title));
+    updateMainForm();
+    mStackedWidget->setCurrentIndex(0);
+    mSearchLineEdit->clear();
+    writeGroupsToXml();
+}
+
 void MainWindow::openMainPage(){
     mStackedWidget->setCurrentIndex(0);
     mSearchLineEdit->clear();
+}
+
+void MainWindow::editGroup(int id){
+    for (auto& info : mGroupInfoArray){
+        if (info->getId() == id){
+            mEditGroupPageForm->updateForm(info);
+            mEditGroupPageForm->setAccounts(mAccountInfoArray);
+        }
+    }
+
+    mStackedWidget->setCurrentIndex(5);
+}
+
+void MainWindow::onTypeSelectChanged(int index){
+    updateMainForm(ListType(index));
+    mSearchLineEdit->setText("");
 }
 
 void MainWindow::searchTextChanged(const QString &searchText) {
@@ -167,37 +298,110 @@ void MainWindow::searchTextChanged(const QString &searchText) {
         }
     }
 
+    for (auto &info : mGroupInfoArray) {
+        if (searchText.isEmpty() || info->getTitle().contains(searchText, Qt::CaseInsensitive)) {
+            addGroupBlock(*info);
+        }
+    }
+
     for (auto &info : mAccountInfoArray) {
         if (searchText.isEmpty() || info->getTitle().contains(searchText, Qt::CaseInsensitive)) {
-            addVerticalBlock(*info);
+            addAccountBlock(*info);
         }
     }
 
     mMainLayout->addStretch();
 }
 
-void MainWindow::removeBlock(int id) {
-    for (int i = 0; i < mAccountInfoArray.size(); ++i) {
-        if (mAccountInfoArray[i]->getId() == id) {
-            delete mAccountInfoArray[i];
-            mAccountInfoArray.removeAt(i);
-            updateAccountsForm();
-            break;
+void MainWindow::removeBlock(int id, PageType type) {
+    if (type == PageType::account){
+        if (mPageType == PageType::account){
+            for (int i = 0; i < mAccountInfoArray.size(); ++i) {
+                if (mAccountInfoArray[i]->getId() == id) {
+                    delete mAccountInfoArray[i];
+                    mAccountInfoArray.removeAt(i);
+                    break;
+                }
+            }
+
+            for (auto& group : mGroupInfoArray){
+                group->removeAccount(id);
+                mGroupPageForm->setGroupInfo(group);
+                mGroupPageForm->updateForm();
+            }
+
+        }else if (mPageType == PageType::group){
+
+            for (auto& group : mGroupInfoArray){
+                group->removeAccount(id);
+                mGroupPageForm->setGroupInfo(group);
+                mGroupPageForm->updateForm();
+            }
+
         }
+
+        writeGroupsToXml();
+        writeAccountsToXml();
+
+        updateMainForm();
+
+    }else if (type == PageType::group){
+
+        for (int i = 0; i < mGroupInfoArray.size(); ++i) {
+            if (mGroupInfoArray[i]->getId() == id) {
+                delete mGroupInfoArray[i];
+                mGroupInfoArray.removeAt(i);
+                break;
+            }
+        }
+
+        updateMainForm();
+        writeGroupsToXml();
     }
 
-    writeAccountsToXml();
 }
-void MainWindow::updateBlock(AccountInfo *info) {
+void MainWindow::updateAccountInfo(AccountInfo *info) {
+
     for (auto &curInfo : mAccountInfoArray) {
         if (curInfo->getId() == info->getId()) {
             *curInfo = *info;
-            updateAccountsForm();
+            updateMainForm();
             break;
         }
     }
 
+
+    for (auto &curInfo : mGroupInfoArray) {
+        QVector<AccountInfo*> accounts = curInfo->getAccounts();
+
+        for(int i = 0; i < accounts.size(); i++){
+            if (accounts[i]->getId() == info->getId()){
+                accounts[i] = info;
+                curInfo->setAccounts(accounts);
+                mGroupPageForm->setGroupInfo(curInfo);
+                mGroupPageForm->updateForm();
+                updateMainForm();
+                writeGroupsToXml();
+                break;
+            }
+        }
+    }
     writeAccountsToXml();
+
+}
+
+void MainWindow::updateGroupInfo(GroupInfo *info){
+    for (auto &curInfo : mGroupInfoArray) {
+        if (curInfo->getId() == info->getId()) {
+            *curInfo = *info;
+            mGroupPageForm->setGroupInfo(curInfo);
+            mGroupPageForm->updateForm();
+            updateMainForm();
+            break;
+        }
+    }
+
+    writeGroupsToXml();
 }
 
 void MainWindow::showNotification(QString message) {
@@ -206,12 +410,27 @@ void MainWindow::showNotification(QString message) {
 }
 
 void MainWindow::connectForms() {
-    connect(mAccountPageForm, &AccountPageForm::closeAccountPage, this, &MainWindow::closeAccountPage);
+    connect(mAccountPageForm, &AccountPageForm::closePage, this, &MainWindow::closePage);
     connect(mAccountPageForm, &AccountPageForm::showNotification, this, &MainWindow::showNotification);
-    connect(mAccountPageForm, &AccountPageForm::updateBlock, this, &MainWindow::updateBlock);
+    connect(mAccountPageForm, &AccountPageForm::updateBlock, this, &MainWindow::updateAccountInfo);
     connect(mAccountPageForm, &AccountPageForm::removeBlock, this, &MainWindow::removeBlock);
+
     connect(mCreateAccountForm, &CreateAccountForm::createAccount, this, &MainWindow::createAccount);
     connect(mCreateAccountForm, &CreateAccountForm::cancel, this, &MainWindow::openMainPage);
+
+    connect(mCreateGroupForm, &CreateGroupForm::cancel, this, &MainWindow::openMainPage);
+    connect(mCreateGroupForm, &CreateGroupForm::createGroup, this, &MainWindow::createGroup);
+
+    connect(mGroupPageForm, &GroupPageForm::closePage, this, &MainWindow::closePage);
+    connect(mGroupPageForm, &GroupPageForm::removeBlock, this, &MainWindow::removeBlock);
+    connect(mGroupPageForm, &GroupPageForm::openPage, this, &MainWindow::openPage);
+    connect(mGroupPageForm, &GroupPageForm::edit, this, &MainWindow::editGroup);
+
+    connect(mEditGroupPageForm, &EditGroupPageForm::closePage, this, &MainWindow::closePage);
+    connect(mEditGroupPageForm, &EditGroupPageForm::removeBlock, this, &MainWindow::removeBlock);
+    connect(mEditGroupPageForm, &EditGroupPageForm::showNotification, this, &MainWindow::showNotification);
+    connect(mEditGroupPageForm, &EditGroupPageForm::updateBlock, this, &MainWindow::updateGroupInfo);
+
 }
 
 void MainWindow::writeAccountsToXml(const QString &fileName) {
@@ -236,7 +455,7 @@ void MainWindow::writeAccountsToXml(const QString &fileName) {
     writer.writeStartDocument();
     writer.writeStartElement("Accounts");
 
-    for (const auto &info : mAccountInfoArray) {
+    for (auto &info : mAccountInfoArray) {
         writer.writeStartElement("Account");
 
         writer.writeAttribute("id", QString::number(info->getId()));
@@ -261,7 +480,7 @@ void MainWindow::writeAccountsToXml(const QString &fileName) {
 void MainWindow::readAccountsFromXml(const QString &fileName) {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString filePath = appDataPath + "/" + fileName;
-
+    qDebug() << filePath;
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
@@ -283,6 +502,111 @@ void MainWindow::readAccountsFromXml(const QString &fileName) {
                 mAccountInfoArray.append(new AccountInfo(id, login, password, title, bgColor, textColor, favorite));
             }
             reader.skipCurrentElement();
+        }
+    }
+
+    file.close();
+}
+
+void MainWindow::writeGroupsToXml(const QString &fileName) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    QDir dir;
+    if (!dir.exists(appDataPath)) {
+        dir.mkpath(appDataPath);
+    }
+
+    QString filePath = appDataPath + "/" + fileName;
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open or create file for writing:" << filePath;
+        return;
+    }
+
+    QXmlStreamWriter writer(&file);
+    writer.setAutoFormatting(true);
+
+    writer.writeStartDocument();
+    writer.writeStartElement("Groups");
+
+    for (const auto &group : mGroupInfoArray) {
+        writer.writeStartElement("Group");
+
+        writer.writeAttribute("id", QString::number(group->getId()));
+        writer.writeAttribute("title", group->getTitle());
+        writer.writeAttribute("bGColor", group->getBgColor().name());
+        writer.writeAttribute("iconColor", group->getIconColor().name());
+        writer.writeAttribute("favorite", QString::number(group->getFavorite()));
+
+        for (const auto &account : group->getAccounts()) {
+            writer.writeStartElement("Account");
+
+            writer.writeAttribute("id", QString::number(account->getId()));
+            writer.writeAttribute("login", account->getLogin());
+            writer.writeAttribute("password", account->getPassword());
+            writer.writeAttribute("title", account->getTitle());
+            writer.writeAttribute("bGColor", account->getBgColor().name());
+            writer.writeAttribute("iconColor", account->getIconColor().name());
+            writer.writeAttribute("favorite", QString::number(account->getFavorite()));
+
+            writer.writeEndElement();
+        }
+
+        writer.writeEndElement();
+    }
+
+    writer.writeEndElement();
+    writer.writeEndDocument();
+
+    file.close();
+}
+
+void MainWindow::readGroupsFromXml(const QString &fileName) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = appDataPath + "/" + fileName;
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open file for reading:" << filePath;
+        return;
+    }
+
+    QXmlStreamReader reader(&file);
+
+    if (reader.readNextStartElement() && reader.name() == "Groups") {
+        while (reader.readNextStartElement()) {
+            if (reader.name() == "Group") {
+                auto id = reader.attributes().value("id").toInt();
+                auto title = reader.attributes().value("title").toString();
+                auto bgColor = QColor(reader.attributes().value("bGColor").toString());
+                auto iconColor = QColor(reader.attributes().value("iconColor").toString());
+                auto favorite = reader.attributes().value("favorite").toInt();
+
+                QVector<AccountInfo*> accounts;
+
+                while (reader.readNextStartElement()) {
+                    if (reader.name() == "Account") {
+                        auto accountId = reader.attributes().value("id").toInt();
+                        auto login = reader.attributes().value("login").toString();
+                        auto password = reader.attributes().value("password").toString();
+                        auto accountTitle = reader.attributes().value("title").toString();
+                        auto accountBgColor = QColor(reader.attributes().value("bGColor").toString());
+                        auto accountIconColor = QColor(reader.attributes().value("iconColor").toString());
+                        auto accountFavorite = reader.attributes().value("favorite").toInt();
+
+                        accounts.append(new AccountInfo(accountId, login, password, accountTitle, accountBgColor, accountIconColor, accountFavorite));
+
+                        reader.skipCurrentElement();
+                    } else {
+                        reader.skipCurrentElement();
+                    }
+                }
+
+                mGroupInfoArray.append(new GroupInfo(id, accounts, title, bgColor, iconColor, favorite));
+            } else {
+                reader.skipCurrentElement();
+            }
         }
     }
 

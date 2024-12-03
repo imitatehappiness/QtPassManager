@@ -7,27 +7,6 @@
 #include <QMessageBox>
 #include <QColorDialog>
 
-const  QString msgBoxStyle =
-    "QMessageBox {"
-    "   background-color: rgb(33, 33, 33);"
-    "   color: #eee;"
-    "}"
-    "QPushButton {"
-    "   background-color: rgb(24, 24, 24);"
-    "   color: #fff;"
-    "   border: 1px solid rgb(24, 24, 24);"
-    "   border-radius: 5px;"
-    "   padding: 5px 10px;"
-    "   min-width: 40px;"
-    "}"
-    "QPushButton:hover {"
-    "   background-color: rgb(60, 60, 60);"
-    "   border: 1px solid rgb(60, 60, 60);"
-    "}"
-    "QPushButton:pressed {"
-    "   border: 1px solid rgb(20, 20, 20);"
-    "}";
-
 AccountPageForm::AccountPageForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AccountPageForm)
@@ -112,7 +91,8 @@ void AccountPageForm::on_pB_close_clicked(){
     ui->lE_login->setEnabled(false);
     ui->lE_title->setEnabled(false);
 
-    emit closeAccountPage();
+    emit closePage(PageType::account);
+    emit showNotification("Saved!");
 }
 
 void AccountPageForm::on_pB_showPass_clicked(){
@@ -152,7 +132,6 @@ void AccountPageForm::on_pB_edit_pass_clicked() {
 
         mAccountInfo->setPassword(ui->lE_pass->text());
 
-        emit showNotification("Saved!");
         emit updateBlock(mAccountInfo);
     }
 }
@@ -172,7 +151,6 @@ void AccountPageForm::on_pB_edit_login_clicked() {
         mAccountInfo->setLogin(ui->lE_login->text());
         ui->l_login->setText(ui->lE_login->text());
 
-        emit showNotification("Saved!");
         emit updateBlock(mAccountInfo);
     }
 }
@@ -197,7 +175,6 @@ void AccountPageForm::on_pB_edit_title_clicked() {
         }
 
 
-        emit showNotification("Saved!");
         emit updateBlock(mAccountInfo);
     }
 }
@@ -205,29 +182,22 @@ void AccountPageForm::on_pB_edit_title_clicked() {
 void AccountPageForm::on_pB_copy_title_clicked(){
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(ui->l_title->text());
-
-    emit showNotification("Copied!");
 }
 
 void AccountPageForm::on_pB_copy_log_clicked(){
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(ui->l_login->text());
-
-    emit showNotification("Copied!");
 }
 
 void AccountPageForm::on_pB_copy_pass_clicked(){
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(ui->lE_pass->text());
-
-    emit showNotification("Copied!");
 }
 
 void AccountPageForm::on_cB_favorite_stateChanged(int arg1){
     mAccountInfo->setFavorite(bool(arg1));
     bool(arg1) ?  ui->cB_favorite->setText("Remove from Favorites") : ui->cB_favorite->setText("Add to Favorites");
 
-    emit showNotification("Saved!");
     emit updateBlock(mAccountInfo);
 }
 
@@ -247,9 +217,9 @@ void AccountPageForm::on_pB_remove_clicked(){
         return;
     }
 
-    emit removeBlock(mAccountInfo->getId());
-    emit closeAccountPage();
-    emit showNotification("Deleted!");
+    emit removeBlock(mAccountInfo->getId(), PageType::account);
+    emit closePage(PageType::account);
+    emit showNotification("Removed!");
 }
 
 
@@ -259,7 +229,6 @@ void AccountPageForm::on_lE_title_textChanged(const QString &arg1){
         ui->icon->setText(QString(arg1.at(0)).toUpper());
     }
 }
-
 
 void AccountPageForm::on_lE_login_textChanged(const QString &arg1){
     ui->l_login->setText(arg1);
@@ -286,6 +255,7 @@ void AccountPageForm::updateStyle() {
         "}"
         "QLabel#icon{"
            "background-color: " + mAccountInfo->getIconColor().name() + "; "
+           "border-radius: 5px; "
         "}";
 
     setStyleSheet(style);
@@ -306,34 +276,29 @@ void AccountPageForm::on_pB_editBgColor_clicked(){
         mAccountInfo->setBgColor(selectedColor);
         updateStyle();
         emit updateBlock(mAccountInfo);
-        emit showNotification("Saved!");
     }
 }
 
 
 void AccountPageForm::on_pB_resetBgColor_clicked(){
-    mAccountInfo->setBgColor(QColor("#202020"));
+    mAccountInfo->setBgColor(QColor(bgCardColorName));
     updateStyle();
     emit updateBlock(mAccountInfo);
-    emit showNotification("Saved!");
 }
 
 
 void AccountPageForm::on_pB_resetIconColor_clicked(){
-    mAccountInfo->setIconColor(QColor("#4F2D8A"));
+    mAccountInfo->setIconColor(QColor(bgIconAccountColorName));
     updateStyle();
     emit updateBlock(mAccountInfo);
-    emit showNotification("Saved!");
 }
 
-
-void AccountPageForm::on_pushButton_clicked(){
+void AccountPageForm::on_pB_editIconColor_clicked(){
     QColor selectedColor = getColor();
     if (selectedColor.isValid()) {
         mAccountInfo->setIconColor(selectedColor);
         updateStyle();
         emit updateBlock(mAccountInfo);
-        emit showNotification("Saved!");
     }
 }
 

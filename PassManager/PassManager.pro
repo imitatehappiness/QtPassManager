@@ -11,6 +11,10 @@ CONFIG += c++17
 SOURCES += \
     accountpageform.cpp \
     createaccountform.cpp \
+    creategroupform.cpp \
+    editgrouppageform.cpp \
+    groupaccountform.cpp \
+    grouppageform.cpp \
     itemblock.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -21,14 +25,24 @@ HEADERS += \
     account_info.h \
     accountpageform.h \
     createaccountform.h \
+    creategroupform.h \
+    editgrouppageform.h \
+    group_info.h \
+    groupaccountform.h \
+    grouppageform.h \
     itemblock.h \
     mainwindow.h \
     popup.h \
+    types.h \
     windowframe.h
 
 FORMS += \
     accountpageform.ui \
     createaccountform.ui \
+    creategroupform.ui \
+    editgrouppageform.ui \
+    groupaccountform.ui \
+    grouppageform.ui \
     itemblock.ui \
     mainwindow.ui \
     windowframe.ui
@@ -41,4 +55,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resources/resources.qrc
 
-win32: RC_ICONS = $$PWD/resources/icons/icon.ico
+# win32: RC_ICONS = $$PWD/resources/icons/icon.ico

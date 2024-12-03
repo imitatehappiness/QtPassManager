@@ -67,6 +67,26 @@ QLineEdit{
     background-color: #eee;
 }
 
+QComboBox{
+    border: none;
+    border-radius: 4px;
+    min-height: 25px;
+    min-width: 100px;
+    padding-left: 5px;
+}
+
+QComboBox::drop-down {
+    width: 25px;  /* Размер иконки */
+    height: 25px;
+    border: none;
+}
+
+QComboBox QAbstractItemView {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    color: #333;
+    selection-background-color: #4F2D8A;
+}
 
 QStatusBar{
     background-color: rgb(20, 20, 20);

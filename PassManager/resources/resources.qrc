@@ -12,5 +12,6 @@
         <file>icons/star.png</file>
         <file>icons/arrow-left.png</file>
         <file>icons/create.png</file>
+        <file>icons/expand_dark.png</file>
     </qresource>
 </RCC>
