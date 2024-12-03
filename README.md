@@ -44,5 +44,5 @@ After executing this command:
 ## UI Demonstration 
 
 <p align="center">
-	<img src="https://github.com/imitatehappiness/QtPassManager/blob/main/resources/demo.png"  />
+  <video src="https://github.com/user-attachments/assets/fb0093a5-0932-449d-a155-269ace343d95" controls></video>
 </p>
