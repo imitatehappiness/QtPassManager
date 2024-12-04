@@ -55,4 +55,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resources/resources.qrc
 
-# win32: RC_ICONS = $$PWD/resources/icons/icon.ico
+win32: RC_ICONS = $$PWD/resources/icons/icon.ico
