@@ -128,22 +128,39 @@ QScrollBar::sub-line:vertical {
     border-radius: 10px;
 }
 
+QScrollBar:horizontal {
+    background-color: rgb(24, 24, 24);
+    width: 8px;
+    margin: 0px 0px 0px 5px;
+    border-radius: 10px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #eee;
+    border-radius: 10px;
+    min-height: 5px;
+}
+
 QScrollBar::add-line:horizontal {
     background-color: rgb(24, 24, 24);
+    border-color: rgb(24, 24, 24);
     height: 0px;
     width: 15px;
     subcontrol-position: bottom;
     subcontrol-origin: margin;
+    border-radius: 10px;
 }
+
 
 QScrollBar::sub-line:horizontal {
     background-color: rgb(24, 24, 24);
+    border-color: rgb(24, 24, 24);
     height: 0px;
-    width: 15px;
+    width: 10px;
     subcontrol-position: top;
     subcontrol-origin: margin;
+    border-radius: 10px;
 }
-
 QWidget#accountList{
     background-color: rgb(24, 24, 24);
 }
