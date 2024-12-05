@@ -130,6 +130,10 @@ void MainWindow::updateMainForm(ListType type) {
     switch (type) {
         case ListType::accounts:
             std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
+                return a->getTitle() < b->getTitle();
+            });
+
+            std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
                 return a->getFavorite() > b->getFavorite();
             });
 
@@ -137,7 +141,12 @@ void MainWindow::updateMainForm(ListType type) {
                 addAccountBlock(*info);
             }
             break;
+
         case ListType::groups:
+            std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
+                return a->getTitle() < b->getTitle();
+            });
+
             std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
                 return a->getFavorite() > b->getFavorite();
             });
@@ -146,7 +155,12 @@ void MainWindow::updateMainForm(ListType type) {
                 addGroupBlock(*info);
             }
             break;
+
         default:
+            std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
+                return a->getTitle() < b->getTitle();
+            });
+
             std::sort(mGroupInfoArray.begin(), mGroupInfoArray.end(), [](GroupInfo *a, GroupInfo *b) {
                 return a->getFavorite() > b->getFavorite();
             });
@@ -154,6 +168,10 @@ void MainWindow::updateMainForm(ListType type) {
             for (auto &info : mGroupInfoArray) {
                 addGroupBlock(*info);
             }
+
+            std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
+                return a->getTitle() < b->getTitle();
+            });
 
             std::sort(mAccountInfoArray.begin(), mAccountInfoArray.end(), [](AccountInfo *a, AccountInfo *b) {
                 return a->getFavorite() > b->getFavorite();
@@ -229,6 +247,23 @@ void MainWindow::closePage(PageType type) {
         mStackedWidget->setCurrentIndex(0);
         mSearchLineEdit->clear();
     }
+
+
+    ListType listType;
+    switch(mTypeSelect->currentIndex()){
+        case 0:
+            listType = ListType::all;
+            break;
+        case 1:
+            listType = ListType::accounts;
+            break;
+        case 2:
+            listType = ListType::groups;
+            break;
+    }
+    updateMainForm(listType);
+    mTypeSelect->setCurrentIndex(int(listType));
+    mSearchLineEdit->setText("");
 
 }
 
