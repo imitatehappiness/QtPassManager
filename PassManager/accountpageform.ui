@@ -45,7 +45,70 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="3">
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="cB_favorite">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Add to Favorites</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="pB_editBgColor">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Edit card color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="pB_editIconColor">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Edit icon color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="3">
        <widget class="QPushButton" name="pB_resetBgColor">
         <property name="minimumSize">
          <size>
@@ -80,69 +143,6 @@
         </property>
         <property name="text">
          <string>Reset color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="4">
-       <widget class="QPushButton" name="pB_editBgColor">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Edit card color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="pB_editIconColor">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>100</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Edit icon color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="cB_favorite">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Add to Favorites</string>
         </property>
        </widget>
       </item>
